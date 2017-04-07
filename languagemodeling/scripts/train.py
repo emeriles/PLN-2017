@@ -29,6 +29,7 @@ if __name__ == '__main__':
 
     # save it
     filename = opts['-o']
+    print(filename)
     f = open(filename, 'wb')
     pickle.dump(model, f)
     f.close()
