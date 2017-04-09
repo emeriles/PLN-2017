@@ -14,12 +14,22 @@ class NGram(object):
         self.counts = counts = defaultdict(int)
 
         for sent in sents:
-            for i in range(len(sent) - n + 1):
-                ngram = tuple(sent[i: i + n])
-                counts[ngram] += 1
-                counts[ngram[:-1]] += 1
+            for x in range(n-1):
+                sent.insert(0, "<s>")
+            sent.insert(len(sent), "</s>")
 
-    def prob(self, token, prev_tokens=None):
+        for sent in sents:
+            for i in range(len(sent) - n + 1):
+                    ngram = tuple(sent[i: i + n])
+                    counts[ngram] += 1
+                    counts[ngram[:-1]] += 1
+
+    def cond_prob(self, token, prev_tokens=None):
+        """Conditional probability of a token.
+
+        token -- the token.
+        prev_tokens -- the previous n-1 tokens (optional only if n = 1).
+        """
         n = self.n
         if not prev_tokens:
             prev_tokens = []
@@ -27,3 +37,23 @@ class NGram(object):
 
         tokens = prev_tokens + [token]
         return float(self.counts[tuple(tokens)]) / self.counts[tuple(prev_tokens)]
+ 
+    def count(self, tokens):
+        """Count for an n-gram or (n-1)-gram.
+ 
+        tokens -- the n-gram or (n-1)-gram tuple.
+        """
+        return self.counts[tuple(tokens)]
+
+    def sent_prob(self, sent):
+        """Probability of a sentence. Warning: subject to underflow problems.
+ 
+        sent -- the sentence as a list of tokens.
+        """
+ 
+    def sent_log_prob(self, sent):
+        """Log-probability of a sentence.
+ 
+        sent -- the sentence as a list of tokens.
+        """
+
