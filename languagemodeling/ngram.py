@@ -1,5 +1,6 @@
 # https://docs.python.org/3/library/collections.html
 from collections import defaultdict
+from math import log
 
 
 class NGram(object):
@@ -36,24 +37,52 @@ class NGram(object):
         assert len(prev_tokens) == n - 1
 
         tokens = prev_tokens + [token]
-        return float(self.counts[tuple(tokens)]) / self.counts[tuple(prev_tokens)]
- 
+
+        denom_count = self.counts[tuple(prev_tokens)]
+        if (denom_count == 0):
+            ret = 0
+        else:
+            ret = float(self.counts[tuple(tokens)]) / denom_count
+        return ret
+
     def count(self, tokens):
         """Count for an n-gram or (n-1)-gram.
- 
+
         tokens -- the n-gram or (n-1)-gram tuple.
         """
         return self.counts[tuple(tokens)]
 
     def sent_prob(self, sent):
         """Probability of a sentence. Warning: subject to underflow problems.
- 
+
         sent -- the sentence as a list of tokens.
         """
- 
+        prob = 1.0
+        n = self.n
+        for x in range(n-1):
+            sent.insert(0, "<s>")
+        sent.insert(len(sent), "</s>")
+        for i in range(n-1, len(sent)):
+            prob *= self.cond_prob(sent[i], sent[i+1-n: i])
+        return prob
+
     def sent_log_prob(self, sent):
         """Log-probability of a sentence.
- 
+
         sent -- the sentence as a list of tokens.
         """
+        prob = 0.0
+        n = self.n
 
+        def log2(x): return log(x, 2)
+
+        for x in range(n-1):
+            sent.insert(0, "<s>")
+        sent.insert(len(sent), "</s>")
+        for i in range(n-1, len(sent)):
+            prob_cond = self.cond_prob(sent[i], sent[i+1-n: i])
+            if (prob_cond != 0):
+                prob += log2(prob_cond)
+            else:
+                return float('-inf')
+        return prob
