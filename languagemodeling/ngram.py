@@ -13,6 +13,7 @@ class NGram(object):
         assert n > 0
         self.n = n
         self.counts = counts = defaultdict(int)
+        self.probs = []
 
         for sent in sents:
             for x in range(n-1):
@@ -24,6 +25,21 @@ class NGram(object):
                     ngram = tuple(sent[i: i + n])
                     counts[ngram] += 1
                     counts[ngram[:-1]] += 1
+
+        # beggin self.probs construction
+        prev_tokens = {k for k in counts.keys() if len(k) <= n-1}
+        # TODOS LOS TOQUENS QUE TENGAN LONGITUD MENOR??
+        single_tokens = {k for k in counts.keys() if len(k) == 1}
+        single_tokens.add(('</s>',))
+        for ptok in prev_tokens:
+            ptok_dic = defaultdict()
+            for stok in single_tokens:
+                probab = self.cond_prob(''.join(stok), list(ptok))
+                if (probab != 0):
+                    ptok_dic[''.join(stok)] = probab
+            print("ptok: ", ptok, dict(ptok_dic))
+            self.probs.insert(len(self.probs), (ptok, dict(ptok_dic)))
+        # end self.probs construction
 
     def cond_prob(self, token, prev_tokens=None):
         """Conditional probability of a token.
@@ -86,3 +102,25 @@ class NGram(object):
             else:
                 return float('-inf')
         return prob
+
+    def ng_keys(self):
+        return self.counts.keys()
+
+
+class NGramGenerator:
+
+    def __init__(self, model):
+        """
+        model -- n-gram model.
+        """
+        self.model = model
+        self.probs = model.probs
+
+    def generate_sent(self):
+        """Randomly generate a sentence."""
+
+    def generate_token(self, prev_tokens=None):
+        """Randomly generate a token, given prev_tokens.
+
+        prev_tokens -- the previous n-1 tokens (optional only if n = 1).
+        """
