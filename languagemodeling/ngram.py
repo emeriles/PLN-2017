@@ -14,6 +14,7 @@ class NGram(object):
         self.n = n
         self.counts = counts = defaultdict(int)
         self.probs = []
+        self.sorted_probs = []
 
         for sent in sents:
             for x in range(n-1):
@@ -28,7 +29,6 @@ class NGram(object):
 
         # beggin self.probs construction
         prev_tokens = {k for k in counts.keys() if len(k) <= n-1}
-        # TODOS LOS TOQUENS QUE TENGAN LONGITUD MENOR??
         single_tokens = {k for k in counts.keys() if len(k) == 1}
         single_tokens.add(('</s>',))
         for ptok in prev_tokens:
@@ -37,8 +37,11 @@ class NGram(object):
                 probab = self.cond_prob(''.join(stok), list(ptok))
                 if (probab != 0):
                     ptok_dic[''.join(stok)] = probab
-            print("ptok: ", ptok, dict(ptok_dic))
+            stok_list = list({(k, v) for (k, v) in ptok_dic.items()})
+            stok_list.sort()
+            self.sorted_probs.insert(len(self.sorted_probs), (ptok, stok_list))
             self.probs.insert(len(self.probs), (ptok, dict(ptok_dic)))
+        self.sorted_probs = dict(self.sorted_probs)
         # end self.probs construction
 
     def cond_prob(self, token, prev_tokens=None):
@@ -115,6 +118,7 @@ class NGramGenerator:
         """
         self.model = model
         self.probs = model.probs
+        self.sorted_probs = model.sorted_probs
 
     def generate_sent(self):
         """Randomly generate a sentence."""
