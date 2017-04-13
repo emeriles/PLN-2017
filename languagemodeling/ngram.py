@@ -20,13 +20,13 @@ class NGram(object):
 
         # Avoid underflow by adding beginning and ending characters in sents
         for sent in sents:
+            self.beginning_words.insert(0, sent[0])
             for x in range(n-1):
                 sent.insert(0, "<s>")
             sent.insert(len(sent), "</s>")
 
         # Make the ngrams (and n-1-grams) aparitions
         for sent in sents:
-            self.beginning_words.insert(0, sent[n-1])
             for i in range(len(sent) - n + 1):
                     ngram = tuple(sent[i: i + n])
                     counts[ngram] += 1
