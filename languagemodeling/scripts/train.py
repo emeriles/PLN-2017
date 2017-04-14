@@ -13,14 +13,12 @@ Options:
   -h --help     Show this screen.
 """
 from docopt import docopt
-import pickle
 from sys import exit
 
 from nltk.corpus import PlaintextCorpusReader
 from nltk.tokenize import RegexpTokenizer
 
 from languagemodeling.ngram import NGram, AddOneNGram
-
 
 
 def _get_sents(filename):
@@ -39,10 +37,11 @@ def _get_sents(filename):
     corpus = PlaintextCorpusReader('.', filename, word_tokenizer=tokenizer)
     return corpus.sents()
 
+
 if __name__ == '__main__':
     opts = docopt(__doc__)
 
-    #get parameters and check them
+    # get parameters and check them
     model_n = int(opts['-n'])
     filename = opts['-o']
     try:
@@ -50,11 +49,11 @@ if __name__ == '__main__':
     except:
         model_t = 'ngram'
     if (model_t not in {'ngram', 'addone'}):
-        print ('Wrong -m parameter. Expected \'ngram\' or \' addone\'')
+        print('Wrong -m parameter. Expected \'ngram\' or \' addone\'')
         exit()
 
     # train the model in the chosen mode
-    sents = _get_sents(filename)        #  TO DO: alert when file not found
+    sents = _get_sents(filename)        # TO DO: alert when file not found
     if (model_t == 'ngram'):
         ngram = NGram(model_n, sents)
     else:

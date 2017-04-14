@@ -17,6 +17,7 @@ from nltk.tokenize import RegexpTokenizer
 from languagemodeling.ngram import NGram, NGramGenerator
 N = 3     # N stands for the N-gram model to be used
 
+
 def _get_sents(filename):
 
     pattern = r'''(?ix)    # set flag to allow verbose regexps
@@ -33,10 +34,11 @@ def _get_sents(filename):
     corpus = PlaintextCorpusReader('.', filename, word_tokenizer=tokenizer)
     return corpus.sents()
 
+
 def main():
     opts = docopt(__doc__)
 
-    #get parameters
+    # get parameters
     nsents = int(opts['-n'])
     filename = opts['-i']
 
@@ -50,12 +52,14 @@ def main():
     for i in range(nsents):
         _pretty_print(generator.generate_sent())
 
+
 def _pretty_print(list_str):
     """Prints a list of tokens as a string"""
     out_str = ''
     for word in list_str:
         out_str += ' ' + word
-    print (out_str)
+    print(out_str)
+
 
 if __name__ == '__main__':
     main()
