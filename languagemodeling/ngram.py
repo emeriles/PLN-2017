@@ -17,13 +17,17 @@ class NGram(object):
         self.probs = {}
         self.sorted_probs = {}
         self.beginning_words = []       # used to generate random sentences
+        set_of_words = {'</s>'}         # set used to get the alphabet size
 
         # Avoid underflow by adding beginning and ending characters in sents
         for sent in sents:
+            # add all words to get the text's universe of words
+            set_of_words = set_of_words | set(sent)
             self.beginning_words.insert(0, sent[0])
             for x in range(n-1):
                 sent.insert(0, "<s>")
             sent.insert(len(sent), "</s>")
+        self.alphab_size = len(set_of_words)
 
         # Make the ngrams (and n-1-grams) aparitions
         for sent in sents:
@@ -139,7 +143,7 @@ class NGram(object):
         return prob
 
 
-class NGramGenerator:
+class NGramGenerator():
 
     def __init__(self, model):
         """
@@ -182,3 +186,34 @@ class NGramGenerator:
             if (rand < prob + acum):
                 return string
             acum += prob
+
+class AddOneNGram(NGram):
+    """
+       Todos los métodos de NGram.
+    """
+
+    def cond_prob(self, token, prev_tokens=None):
+        """Conditional probability of a token.
+
+        token -- the token.
+        prev_tokens -- the previous n-1 tokens (optional only if n = 1).
+        """
+        n = self.n
+        if not prev_tokens:
+            prev_tokens = []
+        assert len(prev_tokens) == n - 1
+
+        tokens = prev_tokens + [token]
+
+        denom_count = self.counts[tuple(prev_tokens)] + self.V()
+        # avoid division by zero
+        if (denom_count == 0):
+            ret = 0
+        else:
+            ret = float(self.counts[tuple(tokens)] + 1.0) / denom_count
+        return ret
+
+    def V(self):
+        """Size of the vocabulary.
+        """
+        return self.alphab_size
