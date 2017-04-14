@@ -31,7 +31,6 @@ def _get_sents(filename):
     tokenizer = RegexpTokenizer(pattern)
 
     corpus = PlaintextCorpusReader('.', filename, word_tokenizer=tokenizer)
-    #print (corpus.sents())
     return corpus.sents()
 
 def main():
@@ -41,10 +40,9 @@ def main():
     nsents = int(opts['-n'])
     filename = opts['-i']
 
-    # get sentences
+    # get sentences                     TO DO: alert when file not found
     corpus = _get_sents(filename)
     # train the model with n-grams
-    n = 1
     ngram = NGram(N, corpus)
     generator = NGramGenerator(ngram)
 

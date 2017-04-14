@@ -187,6 +187,7 @@ class NGramGenerator():
                 return string
             acum += prob
 
+
 class AddOneNGram(NGram):
     """
        Todos los métodos de NGram.
