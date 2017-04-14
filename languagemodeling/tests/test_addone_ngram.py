@@ -117,3 +117,4 @@ class TestAddOneNGram(TestCase):
             prob_sum = sum(model.cond_prob(token, prev) for token in tokens)
             # prob_sum < 1.0 or almost equal to 1.0:
             self.assertTrue(prob_sum < 1.0 or abs(prob_sum - 1.0) < 1e-10)
+
